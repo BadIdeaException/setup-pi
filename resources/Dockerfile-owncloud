@@ -17,6 +17,9 @@ RUN a2enmod rewrite && a2enmod headers && a2enmod env && a2enmod dir && a2enmod 
 RUN make-ssl-cert generate-default-snakeoil
 RUN a2enmod ssl && a2ensite default-ssl && service apache2 restart
 
+# Run a script to set some environment variables required for apache to start
+RUN /etc/apache2/envvars
+
 EXPOSE 80
 EXPOSE 443
 
