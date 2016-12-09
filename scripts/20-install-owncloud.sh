@@ -11,14 +11,14 @@ fi
 # Owncloud version to install
 VERSION=9.1.2
 # Image name prefix to use - default to hostname
-PREFIX=$(hostname)
+IMAGENAME=$(hostname)/owncloud:$VERSION
 
 # Path to resources folder (SCRIPT is only a temp variable)
 SCRIPT=$(readlink -f "$0")
 RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources
 
 # Build the docker image 
-docker build --file "$RESOURCE_LOCATION/Dockerfile-owncloud" --tag $PREFIX/owncloud:$VERSION --build-arg OCVERSION=$VERSION "$RESOURCE_LOCATION"
+docker build --file "$RESOURCE_LOCATION/Dockerfile-owncloud" --tag "$IMAGENAME" --build-arg OCVERSION=$VERSION "$RESOURCE_LOCATION"
 
 # Run it
-docker run --detach --restart=always $PREFIX/owncloud:$VERSION --network intercontainer --publish 7080:80 --publish 7443:443 --volume /var/vol/owncloud/data:/var/www/owncloud/data --name owncloud
+docker run --detach --restart=always --network intercontainer --publish 7080:80 --publish 7443:443 --volume /var/vol/owncloud/data:/var/www/owncloud/data --name owncloud $IMAGENAME

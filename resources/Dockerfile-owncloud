@@ -15,8 +15,13 @@ RUN a2enmod rewrite && a2enmod headers && a2enmod env && a2enmod dir && a2enmod 
 
 # Create selfsigned certificate. Need to replace this with Let's Encrypt
 RUN make-ssl-cert generate-default-snakeoil
-RUN a2enmod ssl && a2ensite default-ssl && service apache2 reload
+RUN a2enmod ssl && a2ensite default-ssl && service apache2 restart
 
 EXPOSE 80
 EXPOSE 443
+
+VOLUME /var/www/owncloud/data
+VOLUME /var/www/owncloud/apps
+
+CMD ["/usr/sbin/apache2", "-DFOREGROUND"]
 

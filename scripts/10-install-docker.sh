@@ -9,7 +9,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Required for installing from the repo
-apt-get install apt-transport-https ca-certificates
+apt-get install -y apt-transport-https ca-certificates
 apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
 
 # Set up ppa
@@ -23,7 +23,7 @@ if [ ! $(apt-cache policy docker-engine | grep dockerproject.org) ]; then
 fi
 
 # Install
-apt-get install docker-engine
+apt-get install -y docker-engine
 
 # Start docker
 service docker start
