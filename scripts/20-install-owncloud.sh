@@ -20,6 +20,11 @@ RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources
 # Build the docker image 
 docker build --file "$RESOURCE_LOCATION/Dockerfile-owncloud" --tag "$IMAGENAME" --build-arg OCVERSION=$VERSION "$RESOURCE_LOCATION"
 
+# Create volumes
+mkdir --parents /var/vol/owncloud/data
+mkdir --parents /var/vol/owncloud/apps
+mkdir --parents /var/vol/owncloud/config
+
 # Fix ownership and permissions
 chown --recursive www-data:www-data /var/vol/owncloud/data /var/vol/owncloud/apps /var/vol/owncloud config
 chmod 751 $(find /var/vol/owncloud -type d)
