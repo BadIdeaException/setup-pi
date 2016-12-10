@@ -16,7 +16,7 @@ RUN a2enmod rewrite && a2enmod headers && a2enmod env && a2enmod dir && a2enmod 
 
 # Create selfsigned certificate. Need to replace this with Let's Encrypt
 RUN make-ssl-cert generate-default-snakeoil
-RUN a2enmod ssl && a2ensite default-ssl
+RUN a2enmod ssl
 
 COPY ./start-server.sh /usr/local/bin/
 
