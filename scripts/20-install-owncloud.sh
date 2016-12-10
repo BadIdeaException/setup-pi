@@ -27,9 +27,9 @@ mkdir --parents /var/vol/owncloud/config
 
 # Fix ownership and permissions
 chown --recursive www-data:www-data /var/vol/owncloud/data /var/vol/owncloud/apps /var/vol/owncloud config
-chmod 751 $(find /var/vol/owncloud -type d)
-chmod 640 $(find /var/vol/owncloud -type f)
-chmod 644 $(find /var/vol/owncloud/certs -type f) 
+find /var/vol/owncloud -type d -printf '"%p" ' | xargs chmod 751
+find /var/vol/owncloud -type f -printf '"%p" ' | xargs chmod 640
+find /var/vol/owncloud/certs -type f -printf '"%p" ' | xargs chmod 644
 chown root:www-data $(find /var/vol/owncloud -name .htaccess)
 chmod 644 $(find /var/vol/owncloud -name .htaccess)
 
