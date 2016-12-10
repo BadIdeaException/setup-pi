@@ -11,11 +11,11 @@ COPY ./owncloud.conf /etc/apache2/sites-available/
 RUN ln -s /etc/apache2/sites-available/owncloud.conf /etc/apache2/sites-enabled/owncloud.conf
 
 # Enable apache2 modules
-RUN a2enmod rewrite && a2enmod headers && a2enmod env && a2enmod dir && a2enmod mime && service apache2 restart
+RUN a2enmod rewrite && a2enmod headers && a2enmod env && a2enmod dir && a2enmod mime
 
 # Create selfsigned certificate. Need to replace this with Let's Encrypt
 RUN make-ssl-cert generate-default-snakeoil
-RUN a2enmod ssl && a2ensite default-ssl && service apache2 restart
+RUN a2enmod ssl && a2ensite default-ssl
 
 # Run a script to set some environment variables required for apache to start
 # Do this in a roundabout way since the x permission isn't set on envvars
