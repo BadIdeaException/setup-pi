@@ -17,8 +17,26 @@ IMAGENAME=$(hostname)/owncloud:$VERSION
 SCRIPT=$(readlink -f "$0")
 RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources
 
+# Get the db root password if not already available
+if [ -n $MYSQL_ROOT_PASSWORD ]; then
+	echo "Enter the MySQL root password"
+	read MYSQL_ROOT_PASSWORD
+fi
+
+# Ask for owncloud admin user name and password
+echo "Enter the owncloud admin username"
+read ADMIN_USER
+echo "Enter the owncloud admin password"
+read ADMIN_PASSWORD
+
 # Build the docker image 
-docker build --file "$RESOURCE_LOCATION/Dockerfile-owncloud" --tag "$IMAGENAME" --build-arg OCVERSION=$VERSION "$RESOURCE_LOCATION"
+docker build --file "$RESOURCE_LOCATION/Dockerfile-owncloud" \
+			--tag "$IMAGENAME" \
+			--build-arg OCVERSION=$VERSION 
+			--env MYSQL_ROOT_PASSWORD \
+			--env ADMIN_USER \
+			--env ADMIN_PASSWORD \
+			"$RESOURCE_LOCATION"
 
 # Create volumes
 mkdir --parents /var/vol/owncloud/data
@@ -39,7 +57,7 @@ docker run --detach \
            --network intercontainer \
            --publish 7080:80 \
            --publish 7443:443 \
-           --volume /var/vol/owncloud/data:/var/www/owncloud/data \
+           --volume /var/vol/owncloud/data:/var/www/data/owncloud \
            --volume /var/vol/owncloud/apps:/var/www/owncloud/apps \
            --volume /var/vol/owncloud/config:/var/www/owncloud/config \
            --name owncloud $IMAGENAME

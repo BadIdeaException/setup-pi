@@ -20,8 +20,16 @@ RUN a2enmod ssl && a2ensite default-ssl
 
 COPY ./start-server.sh /usr/local/bin/
 
+# Move data directory outside of the www directory for security reasons
+RUN mkdir --parent /var/data/owncloud && chown www-data:www-data /var/data/owncloud && chmod 751 /var/data/owncloud
+
+ENV $MYSQL_ROOT_PASSWORD
+ENV $ADMIN_USER
+ENV $ADMIN_PASSWORD
+RUN cd /var/www/owncloud && sudo -u www-data php occ  maintenance:install --database "mysql" --database-name "owncloud"  --database-user "root" --database-host intercontainer --database-pass $MYSQL_ROOT_PASSWORD --admin-user $ADMIN_USER --admin-pass $ADMIN_PASSWORD --data-dir "/var/data/owncloud"
+
 EXPOSE 80 443
-VOLUME /var/www/owncloud/data /var/www/owncloud/apps /var/www/owncloud/config
+VOLUME /var/data/owncloud /var/www/owncloud/apps /var/www/owncloud/config
 
 # Run /etc/apache2/envvars first to set some environment variables apache needs (like lock dir)
 # Need to do this in a roundabout way since the x permission isn't set on envvars
