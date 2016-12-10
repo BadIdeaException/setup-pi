@@ -21,7 +21,7 @@ RUN a2enmod ssl && a2ensite default-ssl
 COPY ./start-server.sh /usr/local/bin/
 
 # Move data directory outside of the www directory for security reasons
-RUN mkdir --parent /var/data/owncloud && chown www-data:www-data /var/data/owncloud && chmod 751 /var/data/owncloud
+RUN mkdir --parents /var/data/owncloud && chown www-data:www-data /var/data/owncloud && chmod 751 /var/data/owncloud
 
 ENV MYSQL_ROOT_PASSWORD
 ENV ADMIN_USER
