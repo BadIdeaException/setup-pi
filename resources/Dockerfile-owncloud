@@ -26,7 +26,7 @@ RUN mkdir --parents /var/data/owncloud && chown www-data:www-data /var/data/ownc
 ARG MYSQL_ROOT_PASSWORD
 ARG ADMIN_USER
 ARG ADMIN_PASSWORD
-RUN cd /var/www/owncloud && sudo -u www-data php occ  maintenance:install --database "mysql" --database-name "owncloud"  --database-user "root" --database-host "mysql" --database-pass $MYSQL_ROOT_PASSWORD --admin-user $ADMIN_USER --admin-pass $ADMIN_PASSWORD --data-dir "/var/data/owncloud"
+RUN cd /var/www/owncloud && sudo -u www-data php occ  maintenance:install --database "mysql" --database-name "owncloud"  --database-user "root" --database-host "mysql" --database-pass "$MYSQL_ROOT_PASSWORD" --admin-user "$ADMIN_USER" --admin-pass "$ADMIN_PASSWORD" --data-dir "/var/data/owncloud"
 
 EXPOSE 80 443
 VOLUME /var/data/owncloud /var/www/owncloud/apps /var/www/owncloud/config
