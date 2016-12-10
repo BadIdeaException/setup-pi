@@ -18,7 +18,7 @@ SCRIPT=$(readlink -f "$0")
 RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources
 
 # Get the db root password if not already available
-if [ -n $MYSQL_ROOT_PASSWORD ]; then
+if [ -z $MYSQL_ROOT_PASSWORD ]; then
 	echo "Enter the MySQL root password"
 	read MYSQL_ROOT_PASSWORD
 fi
@@ -32,7 +32,7 @@ read ADMIN_PASSWORD
 # Build the docker image 
 docker build --file "$RESOURCE_LOCATION/Dockerfile-owncloud" \
 			--tag "$IMAGENAME" \
-			--build-arg OCVERSION=$VERSION 
+			--build-arg OCVERSION=$VERSION \
 			--env MYSQL_ROOT_PASSWORD \
 			--env ADMIN_USER \
 			--env ADMIN_PASSWORD \
@@ -44,7 +44,7 @@ mkdir --parents /var/vol/owncloud/apps
 mkdir --parents /var/vol/owncloud/config
 
 # Fix ownership and permissions
-chown --recursive www-data:www-data /var/vol/owncloud/data /var/vol/owncloud/apps /var/vol/owncloud config
+chown --recursive www-data:www-data /var/vol/owncloud/data /var/vol/owncloud/apps /var/vol/owncloud/config
 find /var/vol/owncloud -type d -printf '"%p" ' | xargs chmod 751
 find /var/vol/owncloud -type f -printf '"%p" ' | xargs chmod 640
 find /var/vol/owncloud/certs -type f -printf '"%p" ' | xargs chmod 644
