@@ -20,5 +20,21 @@ RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources
 # Build the docker image 
 docker build --file "$RESOURCE_LOCATION/Dockerfile-owncloud" --tag "$IMAGENAME" --build-arg OCVERSION=$VERSION "$RESOURCE_LOCATION"
 
+# Fix ownership and permissions
+chown --recursive www-data:www-data /var/vol/owncloud/data /var/vol/owncloud/apps /var/vol/owncloud config
+chmod 751 $(find /var/vol/owncloud -type d)
+chmod 640 $(find /var/vol/owncloud -type f)
+chmod 644 $(find /var/vol/owncloud/certs -type f) 
+chown root:www-data $(find /var/vol/owncloud -name .htaccess)
+chmod 644 $(find /var/vol/owncloud -name .htaccess)
+
 # Run it
-docker run --detach --restart=always --network intercontainer --publish 7080:80 --publish 7443:443 --volume /var/vol/owncloud/data:/var/www/owncloud/data --name owncloud $IMAGENAME
+docker run --detach \
+           --restart=always \
+           --network intercontainer \
+           --publish 7080:80 \
+           --publish 7443:443 \
+           --volume /var/vol/owncloud/data:/var/www/owncloud/data \
+           --volume /var/vol/owncloud/apps:/var/www/owncloud/apps \
+           --volume /var/vol/owncloud/config:/var/www/owncloud/config \
+           --name owncloud $IMAGENAME
