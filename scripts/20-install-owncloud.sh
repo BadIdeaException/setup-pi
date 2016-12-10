@@ -30,8 +30,8 @@ chown --recursive www-data:www-data /var/vol/owncloud/data /var/vol/owncloud/app
 find /var/vol/owncloud -type d -printf '"%p" ' | xargs chmod 751
 find /var/vol/owncloud -type f -printf '"%p" ' | xargs chmod 640
 find /var/vol/owncloud/certs -type f -printf '"%p" ' | xargs chmod 644
-chown root:www-data $(find /var/vol/owncloud -name .htaccess)
-chmod 644 $(find /var/vol/owncloud -name .htaccess)
+find /var/vol/owncloud -name ".htaccess" | xargs chown root:www-data
+find /var/vol/owncloud -name ".htaccess" | xargs chmod 644
 
 # Run it
 docker run --detach \
