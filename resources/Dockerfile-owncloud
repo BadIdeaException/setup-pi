@@ -23,7 +23,7 @@ COPY ./start-server.sh /usr/local/bin/
 # Move data directory outside of the www directory for security reasons
 RUN mkdir --parents /var/data/owncloud && chown www-data:www-data /var/data/owncloud && chmod 751 /var/data/owncloud
 
-EXPOSE 80 443
+EXPOSE 7080 7443
 VOLUME /var/data/owncloud /var/www/owncloud/apps /var/www/owncloud/config
 
 CMD /usr/local/bin/start-server.sh
