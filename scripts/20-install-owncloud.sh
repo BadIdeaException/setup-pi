@@ -55,8 +55,8 @@ find /var/vol/owncloud -name ".htaccess" | xargs chmod 644
 docker run --detach \
            --restart=always \
            --network intercontainer \
-           --publish 7080:80 \
-           --publish 7443:443 \
+           --publish 7080:7080 \
+           --publish 7443:7443 \
            --volume /var/vol/owncloud/data:/var/www/data/owncloud \
            --volume /var/vol/owncloud/apps:/var/www/owncloud/apps \
            --volume /var/vol/owncloud/config:/var/www/owncloud/config \
