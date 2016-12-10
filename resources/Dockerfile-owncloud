@@ -23,9 +23,9 @@ COPY ./start-server.sh /usr/local/bin/
 # Move data directory outside of the www directory for security reasons
 RUN mkdir --parents /var/data/owncloud && chown www-data:www-data /var/data/owncloud && chmod 751 /var/data/owncloud
 
-ENV MYSQL_ROOT_PASSWORD
-ENV ADMIN_USER
-ENV ADMIN_PASSWORD
+ARG MYSQL_ROOT_PASSWORD
+ARG ADMIN_USER
+ARG ADMIN_PASSWORD
 RUN cd /var/www/owncloud && sudo -u www-data php occ  maintenance:install --database "mysql" --database-name "owncloud"  --database-user "root" --database-host "mysql" --database-pass $MYSQL_ROOT_PASSWORD --admin-user $ADMIN_USER --admin-pass $ADMIN_PASSWORD --data-dir "/var/data/owncloud"
 
 EXPOSE 80 443

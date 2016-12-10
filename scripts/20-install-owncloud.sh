@@ -33,9 +33,9 @@ read ADMIN_PASSWORD
 docker build --file "$RESOURCE_LOCATION/Dockerfile-owncloud" \
 			--tag "$IMAGENAME" \
 			--build-arg OCVERSION=$VERSION \
-			--env MYSQL_ROOT_PASSWORD \
-			--env ADMIN_USER \
-			--env ADMIN_PASSWORD \
+			--build-arg MYSQL_ROOT_PASSWORD \
+			--build-arg ADMIN_USER \
+			--build-arg ADMIN_PASSWORD \
 			"$RESOURCE_LOCATION"
 
 # Create volumes
