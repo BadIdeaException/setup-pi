@@ -18,11 +18,13 @@ RUN a2enmod rewrite && a2enmod headers && a2enmod env && a2enmod dir && a2enmod 
 RUN make-ssl-cert generate-default-snakeoil
 RUN a2enmod ssl && a2ensite default-ssl
 
+COPY ./start-server.sh /usr/local/bin/
+
 EXPOSE 80 443
 VOLUME /var/www/owncloud/data /var/www/owncloud/apps /var/www/owncloud/config
 
 # Run /etc/apache2/envvars first to set some environment variables apache needs (like lock dir)
 # Need to do this in a roundabout way since the x permission isn't set on envvars
 # Run apache non-daemonized since the container itself will be daemonized
-CMD /bin/bash -c "source /etc/apache2/envvars && /usr/sbin/apache2 -DFOREGROUND"
+CMD /usr/local/bin/start-server.sh
 
