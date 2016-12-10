@@ -29,15 +29,6 @@ read ADMIN_USER
 echo "Enter the owncloud admin password"
 read ADMIN_PASSWORD
 
-# Build the docker image 
-docker build --file "$RESOURCE_LOCATION/Dockerfile-owncloud" \
-			--tag "$IMAGENAME" \
-			--build-arg OCVERSION=$VERSION \
-			--build-arg MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
-			--build-arg ADMIN_USER=$ADMIN_USER \
-			--build-arg ADMIN_PASSWORD=$ADMIN_PASSWORD \
-			"$RESOURCE_LOCATION"
-
 # Create volumes
 mkdir --parents /var/vol/owncloud/data
 mkdir --parents /var/vol/owncloud/apps
@@ -51,13 +42,30 @@ find /var/vol/owncloud/certs -type f -printf '"%p" ' | xargs chmod 644
 find /var/vol/owncloud -name ".htaccess" | xargs chown root:www-data
 find /var/vol/owncloud -name ".htaccess" | xargs chmod 644
 
+# Build the docker image 
+docker build --file "$RESOURCE_LOCATION/Dockerfile-owncloud" \
+			--tag "$IMAGENAME" \
+			--build-arg OCVERSION=$VERSION \
+			--build-arg MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
+			--build-arg ADMIN_USER=$ADMIN_USER \
+			--build-arg ADMIN_PASSWORD=$ADMIN_PASSWORD \
+			"$RESOURCE_LOCATION"
+
+# Run setup
+docker run --network intercontainer \
+		   --volume /var/vol/owncloud/data:/var/data/owncloud \
+		   --volume /var/vol/owncloud/apps:/var/www/owncloud/apps \
+		   --volume /var/vol/owncloud/config:/var/www/owncloud/config \
+		   --name owncloud-config $IMAGENAME \
+		   /bin/bash -c 'cd /var/www/owncloud && sudo -u www-data php occ  maintenance:install --database "mysql" --database-name "owncloud"  --database-user "root" --database-host "mysql" --database-pass "$MYSQL_ROOT_PASSWORD" --admin-user "$ADMIN_USER" --admin-pass "$ADMIN_PASSWORD" --data-dir "/var/data/owncloud"'
+
 # Run it
 docker run --detach \
            --restart=always \
            --network intercontainer \
            --publish 7080:7080 \
            --publish 7443:7443 \
-           --volume /var/vol/owncloud/data:/var/www/data/owncloud \
+           --volume /var/vol/owncloud/data:/var/data/owncloud \
            --volume /var/vol/owncloud/apps:/var/www/owncloud/apps \
            --volume /var/vol/owncloud/config:/var/www/owncloud/config \
            --name owncloud $IMAGENAME
