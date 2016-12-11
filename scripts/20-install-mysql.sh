@@ -15,4 +15,4 @@ fi
 
 docker pull hypriot/rpi-mysql
 
-docker run --detach --restart=always --network intercontainer --env MYSQL_ROOT_PASSWORD --name mysql hypriot/rpi-mysql
+docker run --detach --restart=always --network intercontainer --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" --name mysql hypriot/rpi-mysql
