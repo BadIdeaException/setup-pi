@@ -29,23 +29,24 @@ read ADMIN_USER
 echo "Enter the owncloud admin password"
 read ADMIN_PASSWORD
 
+DATAPATH=/var/owncloud_data
 # Create volumes
 mkdir --parents /var/vol/owncloud/data
-mkdir --parents /var/vol/owncloud/apps
 mkdir --parents /var/vol/owncloud/config
 
 # Fix ownership and permissions
-chown --recursive www-data:www-data /var/vol/owncloud/data /var/vol/owncloud/apps /var/vol/owncloud/config
-find /var/vol/owncloud -type d -printf '"%p" ' | xargs chmod 751
-find /var/vol/owncloud -type f -printf '"%p" ' | xargs chmod 640
-find /var/vol/owncloud/certs -type f -printf '"%p" ' | xargs chmod 644
-find /var/vol/owncloud -name ".htaccess" | xargs chown root:www-data
-find /var/vol/owncloud -name ".htaccess" | xargs chmod 644
+chown --recursive www-data:www-data /var/vol/owncloud/data /var/vol/owncloud/config
+find /var/vol/owncloud -type d -print0 | xargs -0 chmod 751
+find /var/vol/owncloud -type f -print0 | xargs -0 chmod 640
+find /var/vol/owncloud/certs -type f -print0 | xargs -0 chmod 644
+find /var/vol/owncloud -name ".htaccess" -print0 | xargs -0 chown root:www-data
+find /var/vol/owncloud -name ".htaccess" -print0 | xargs -0 chmod 644
 
 # Build the docker image 
 docker build --file "$RESOURCE_LOCATION/Dockerfile-owncloud" \
 			--tag "$IMAGENAME" \
 			--build-arg OCVERSION=$VERSION \
+      --build-arg DATAPATH=$DATAPATH \
 			"$RESOURCE_LOCATION"
 
 # Run it
@@ -54,10 +55,9 @@ docker run --detach \
            --network intercontainer \
            --publish 7080:7080 \
            --publish 7443:7443 \
-           --volume /var/vol/owncloud/data:/var/data/owncloud \
-           --volume /var/vol/owncloud/apps:/var/www/owncloud/apps \
+           --volume /var/vol/owncloud/data:$DATAPATH \
            --volume /var/vol/owncloud/config:/var/www/owncloud/config \
            --name owncloud $IMAGENAME
 
 # Set up owncloud
-docker exec owncloud /bin/bash -c "cd /var/www/owncloud && sudo -u www-data php occ  maintenance:install --database \"mysql\" --database-name \"owncloud\"  --database-user \"root\" --database-host \"mysql\" --database-pass \"$MYSQL_ROOT_PASSWORD\" --admin-user \"$ADMIN_USER\" --admin-pass \"$ADMIN_PASSWORD\" --data-dir \"/var/data/owncloud\""
+docker exec --user www-data owncloud /bin/bash -c "cd /var/www/owncloud && php occ  maintenance:install --database \"mysql\" --database-name \"owncloud\"  --database-user \"root\" --database-host \"mysql\" --database-pass \"$MYSQL_ROOT_PASSWORD\" --admin-user \"$ADMIN_USER\" --admin-pass \"$ADMIN_PASSWORD\" --data-dir=\"$DATAPATH\""

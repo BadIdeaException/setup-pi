@@ -1,4 +1,5 @@
-FROM resin/rpi-raspbian
+#FROM resin/rpi-raspbian
+FROM debian:jessie
 
 # Merged three different installs. In case of errors split up. Removed mariadb-server (separate container)
 RUN apt-get update && apt-get install -y apache2 libapache2-mod-php5 php5-gd php5-json php5-mysql php5-curl php5-intl php5-mcrypt php5-imagick curl bzip2 ssl-cert
@@ -7,10 +8,13 @@ RUN apt-get update && apt-get install -y apache2 libapache2-mod-php5 php5-gd php
 ARG OCVERSION=9.1.2
 RUN curl https://download.owncloud.org/community/owncloud-$OCVERSION.tar.bz2 | tar --extract --bzip2 --directory=/var/www
 
+# Disable all other sites
+RUN basename -z $(ls /etc/apache2/sites-enabled/*.conf) | xargs -0 a2dissite
+# Copy configuration files
 COPY ./owncloud.conf /etc/apache2/sites-available/
 COPY ./ports.conf /etc/apache2/
-RUN rm --force /etc/apache2/sites-enabled/*
-RUN ln --symbolic /etc/apache2/sites-available/owncloud.conf /etc/apache2/sites-enabled/owncloud.conf
+# Enable site owncloud
+RUN a2ensite owncloud
 
 # Enable apache2 modules
 RUN a2enmod rewrite && a2enmod headers && a2enmod env && a2enmod dir && a2enmod mime
@@ -22,10 +26,13 @@ RUN a2enmod ssl
 COPY ./start-server.sh /usr/local/bin/
 
 # Move data directory outside of the www directory for security reasons
-RUN mkdir --parents /var/data/owncloud && chown www-data:www-data /var/data/owncloud && chmod 751 /var/data/owncloud
+ARG DATAPATH=/var/www/owncloud/data
+RUN mkdir --parents $DATAPATH
+COPY ./owncloud-fix-permissions.sh /tmp
+RUN /tmp/owncloud-fix-permissions.sh
 
 EXPOSE 7080 7443
-VOLUME /var/data/owncloud /var/www/owncloud/apps /var/www/owncloud/config
+VOLUME $DATAPATH /var/www/owncloud/config
 
 CMD /usr/local/bin/start-server.sh
 
