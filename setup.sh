@@ -9,10 +9,10 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Run updates
-apt-get update && apt-get upgrade
+apt-get -y update && apt-get -y upgrade
 
 # Set up user "chris" as a replacement for "pi"
-./scripts/00-setup-users.sh chris
+#./scripts/00-setup-users.sh chris
 
 # Install docker
 ./scripts/10-install-docker.sh

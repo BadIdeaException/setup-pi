@@ -13,6 +13,12 @@ if [ ! $MYSQL_ROOT_PASSWORD ]; then
    read MYSQL_ROOT_PASSWORD
 fi
 
-docker pull hypriot/rpi-mysql
+mkdir --parents /var/vol/mysql/dumps
 
-docker run --detach --restart=always --network intercontainer --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" --name mysql hypriot/rpi-mysql
+#docker pull hypriot/rpi-mysql
+docker run --detach \
+		   --restart=always \
+		   --network intercontainer \
+		   --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
+		   --volume /var/vol/mysql/dumps:/backups \
+		   --name mysql hypriot/rpi-mysql

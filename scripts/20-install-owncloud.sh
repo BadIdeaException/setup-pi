@@ -15,7 +15,7 @@ IMAGENAME=$(hostname)/owncloud:$VERSION
 
 # Path to resources folder (SCRIPT is only a temp variable)
 SCRIPT=$(readlink -f "$0")
-RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources
+RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources/owncloud
 
 # Get the db root password if not already available
 if [ -z $MYSQL_ROOT_PASSWORD ]; then
@@ -43,7 +43,7 @@ find /var/vol/owncloud -name ".htaccess" -print0 | xargs -0 chown root:www-data
 find /var/vol/owncloud -name ".htaccess" -print0 | xargs -0 chmod 644
 
 # Build the docker image 
-docker build --file "$RESOURCE_LOCATION/Dockerfile-owncloud" \
+docker build --file "$RESOURCE_LOCATION/owncloud-Dockerfile" \
 			--tag "$IMAGENAME" \
 			--build-arg OCVERSION=$VERSION \
       --build-arg DATAPATH=$DATAPATH \
@@ -60,4 +60,4 @@ docker run --detach \
            --name owncloud $IMAGENAME
 
 # Set up owncloud
-docker cp $RESOURCE_LOCATION/owncloud-config.sh owncloud:/tmp/ && docker exec owncloud /bin/bash -c "DATAPATH=\"$DATAPATH\" /tmp/owncloud-config.sh"
+docker cp $RESOURCE_LOCATION/owncloud-config.sh owncloud:/tmp/ && docker exec --user www-data owncloud /bin/bash -c "DATAPATH=\"$DATAPATH\" /tmp/owncloud-config.sh"
