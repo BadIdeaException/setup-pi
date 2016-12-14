@@ -60,4 +60,4 @@ docker run --detach \
            --name owncloud $IMAGENAME
 
 # Set up owncloud
-docker exec --user www-data owncloud /bin/bash -c "cd /var/www/owncloud && php occ  maintenance:install --database \"mysql\" --database-name \"owncloud\"  --database-user \"root\" --database-host \"mysql\" --database-pass \"$MYSQL_ROOT_PASSWORD\" --admin-user \"$ADMIN_USER\" --admin-pass \"$ADMIN_PASSWORD\" --data-dir=\"$DATAPATH\""
+docker cp $RESOURCE_LOCATION/owncloud-config.sh owncloud:/tmp/ && docker exec owncloud /bin/bash -c "DATAPATH=\"$DATAPATH\" /tmp/owncloud-config.sh"
