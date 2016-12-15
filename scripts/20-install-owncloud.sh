@@ -14,7 +14,8 @@ VERSION=9.1.2
 IMAGENAME=$(hostname)/owncloud:$VERSION
 
 # Path to resources folder
-RESOURCE_LOCATION=$(dirname "$(readlink -f \"$0\")")/../resources/owncloud
+SCRIPT=$(readlink -f "$0")
+RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources/owncloud
 
 # Get the db root password if not already available
 if [ -z $MYSQL_ROOT_PASSWORD ]; then
