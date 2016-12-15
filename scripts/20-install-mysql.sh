@@ -8,6 +8,9 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+# Path to resources folder
+RESOURCE_LOCATION=$(dirname "$(readlink -f \"$0\")")/../resources/mysql
+
 if [ ! $MYSQL_ROOT_PASSWORD ]; then
    echo "A MySQL root password has not been set. Please enter one now and make sure you remember it:"
    read MYSQL_ROOT_PASSWORD
@@ -22,3 +25,5 @@ docker run --detach \
 		   --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
 		   --volume /var/vol/mysql/dumps:/backups \
 		   --name mysql hypriot/rpi-mysql
+
+cp $RESOURCE_LOCATION/mysql-dump.sh /etc/cron.daily
