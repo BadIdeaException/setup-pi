@@ -60,4 +60,23 @@ docker run --detach \
            --name owncloud $IMAGENAME
 
 # Set up owncloud
-docker cp $RESOURCE_LOCATION/owncloud-config.sh owncloud:/tmp/ && docker exec --user www-data owncloud /bin/bash -c "DATAPATH=\"$DATAPATH\" /tmp/owncloud-config.sh"
+docker cp $RESOURCE_LOCATION/owncloud-config.sh owncloud:/tmp/ && docker exec --user www-data   owncloud /bin/bash -c "DATAPATH=\"$DATAPATH\" /tmp/owncloud-config.sh"
+
+docker exec --interactive --user www-data \
+            owncloud \
+            /bin/bash <<EOF 
+                cd /var/www/owncloud
+                php occ  maintenance:install \
+                         --database "mysql" \
+                         --database-name "owncloud" \
+                         --database-user "root" \
+                         --database-host "mysql" \
+                         --database-pass "$MYSQL_ROOT_PASSWORD" \
+                         --admin-user "$ADMIN_USER" \
+                         --admin-pass "$ADMIN_PASSWORD" \
+                         --data-dir="$DATAPATH"
+                php occ maintenance:mode --on
+                php occ config:system:set trusted_domains 1 --value 'chrissrv'
+                php occ config:system:set trusted_domains 2 --value 'chriscloud.privatedns.org'
+                php occ maintenance:mode --off
+EOF
