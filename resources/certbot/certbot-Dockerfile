@@ -1,0 +1,12 @@
+FROM resin/rpi-raspbian
+
+# Install certbot-auto from scratch as per their website
+RUN apt-get update && cd /tmp && wget https://dl.eff.org/certbot-auto && chmod a+x certbot-auto && mv certbot-auto /usr/bin
+
+# Create directory under /var/certbot to serve challenges from
+RUN mkdir -p /var/certbot/.well-known/acme-challenge
+
+COPY ./challenge-server.py /usr/local/bin/
+COPY ./certbot-start-server.sh /usr/local/bin/
+
+CMD /usr/local/bin/certbot-start-server.sh
