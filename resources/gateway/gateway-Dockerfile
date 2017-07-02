@@ -1,0 +1,24 @@
+FROM resin/rpi-raspbian
+
+# Install apache web server
+RUN apt-get update && apt-get install -y apache2
+
+# Enable mod_proxy on this server
+# This mod also enables the reverse proxy functionality that will be used 
+# to turn the server into a gateway
+RUN a2enmod mod_proxy
+
+# Disable all other sites
+RUN basename -z $(ls /etc/apache2/sites-enabled/*.conf) | xargs -0 a2dissite
+
+# Copy configuration files
+COPY ./owncloud-proxy.conf /etc/apache2/sites-available/
+# Enable site owncloud-proxy
+RUN a2ensite owncloud-proxy
+
+# Copy startup script
+COPY ./gateway-start-server.sh /usr/local/bin/
+
+EXPOSE 80 443
+
+CMD /usr/local/bin/gateway-start-server.sh
