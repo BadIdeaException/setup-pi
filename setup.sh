@@ -12,13 +12,19 @@ fi
 apt-get -y update && apt-get -y upgrade
 
 # Set up user "chris" as a replacement for "pi"
-#./scripts/00-setup-users.sh chris
+./scripts/00-setup-users.sh chris
 
 # Install docker
 ./scripts/10-install-docker.sh
 
 # Create a network for inter-container communication
 docker network create intercontainer
+
+# Install an apache server to act as a gateway
+./scripts/20-install-gateway.sh
+
+# Install certbot to enable Let's Encrypt certificates
+./scripts/20-install-certbot.sh
 
 # Install mysql
 ./scripts/20-install-mysql.sh
