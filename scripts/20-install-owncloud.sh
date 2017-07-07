@@ -21,6 +21,9 @@ RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources/owncloud
 if [ -z $MYSQL_ROOT_PASSWORD ]; then
 	echo "Enter the MySQL root password"
 	read MYSQL_ROOT_PASSWORD
+  # Export and persist
+  export MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+  echo "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD" >> /etc/environment
 fi
 
 # Ask for owncloud admin user name and password
@@ -77,6 +80,6 @@ docker exec --interactive --user www-data \
                          --data-dir="$DATAPATH"
                 php occ maintenance:mode --on
                 php occ config:system:set trusted_domains 1 --value 'chrissrv'
-                php occ config:system:set trusted_domains 2 --value 'chriscloud.privatedns.org'
+                php occ config:system:set trusted_domains 2 --value 'dinosaurs.privatedns.org'
                 php occ maintenance:mode --off
 EOF
