@@ -7,4 +7,5 @@ source /etc/apache2/envvars
 # So delete it
 rm -f $APACHE_PID_FILE
 
+echo "Starting owncloud on Apache 2 server"
 /usr/sbin/apache2 -DFOREGROUND
