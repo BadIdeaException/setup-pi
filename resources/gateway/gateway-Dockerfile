@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y apache2
 # This mod also enables the reverse proxy functionality that will be used 
 # to turn the server into a gateway
 # Enable ssl module to enable https forwarding as well
-RUN a2enmod mod_proxy proxy_http ssl
+RUN a2enmod proxy proxy_http ssl
 
 # Disable all other sites
 RUN basename -z $(ls /etc/apache2/sites-enabled/*.conf) | xargs -0 a2dissite
