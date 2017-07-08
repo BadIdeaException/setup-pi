@@ -1,0 +1,4 @@
+{
+	"domain": "dinosaurs.privatedns.org",
+	"target": "http://owncloud:7080"
+}
