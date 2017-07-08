@@ -20,6 +20,7 @@ if (args.hasOwnProperty('help')) {
 		'You can specify the following command line options: \n' + 
 		'\n' + 
 		'    --sitepath=PATH        Read site definitions from PATH instead of standard /etc/redbird/sites.d\n' +
+		'    --debug                Output bunyan debug information that is normally suppressed\n' + 
 		'    --help                 Display this help message'
 	);
 	process.exit();
@@ -29,7 +30,7 @@ var sitepath = args['sitepath'] || '/etc/redbird/sites.d/'; // Override default 
 if (!sitepath.endsWith('/')) { sitepath += '/' }; // Make sure there's a trailing slash
 
 var config = JSON.parse(fs.readFileSync(args['config'] || '/etc/redbird/redbird.conf')); // Read configuration from default or overridden config file
-config.bunyan = config.bunyan || false; // Default bunyan logging to false unless specifically overridden
+config.bunyan = config.bunyan || args.hasOwnProperty('debug') || false; // Default bunyan logging to false unless specifically overridden in config or by command line
 
 console.log(
 	'Redbird based gateway\n' + 
