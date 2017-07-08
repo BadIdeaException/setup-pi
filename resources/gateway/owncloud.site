@@ -1,4 +1,12 @@
 {
 	"domain": "dinosaurs.privatedns.org",
-	"target": "http://owncloud:7080"
+	"target": "http://owncloud:7080",
+	"options": {
+		"ssl": {
+			"letsencrypt": {
+				"email": "tigerman33@gmx.net",
+				"production": false
+			}
+		}
+	}
 }
