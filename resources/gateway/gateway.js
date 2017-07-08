@@ -9,6 +9,7 @@ var args = function processArgs(argArray) {
 		.slice(2) // Cut off the first two parameters (node invocation and this script file as an argument to node)
 		.forEach(function(arg) {
 			arg = arg.split('='); // Arguments are in the form option=value, split current one into array [option,value]
+			if (arg[0].startsWith('--')) { arg[0] = arg[0].slice(2); } // Cut off the -- at the beginning of the argument
 			result[arg[0]] = arg[1];
 		});
 	return result;
@@ -24,9 +25,11 @@ console.log('Redbird based gateway\n');
 if (args.hasOwnProperty('help')) {
 	console.log(
 		'You can specify the following command line options: \n' + 
+		'\n' + 
 		'    --sitepath=PATH        Read site definitions from PATH instead of standard /etc/redbird/sites.d\n' +
 		'    --help                 Display this help message'
 	);
+	process.exit();
 }
 
 console.log('Reading sites from ' + sitepath);
