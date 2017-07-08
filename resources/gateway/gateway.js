@@ -30,7 +30,7 @@ var sitepath = args['sitepath'] || '/etc/redbird/sites.d/'; // Override default 
 if (!sitepath.endsWith('/')) { sitepath += '/' }; // Make sure there's a trailing slash
 
 var config = JSON.parse(fs.readFileSync(args['config'] || '/etc/redbird/redbird.conf')); // Read configuration from default or overridden config file
-config.bunyan = (config.bunyan || args.hasOwnProperty('debug') && { name: 'gateway' } || false; // Default bunyan logging to false unless specifically overridden in config or by command line
+//config.bunyan = (config.bunyan || args.hasOwnProperty('debug') && { name: 'gateway' } || false; // Default bunyan logging to false unless specifically overridden in config or by command line
 
 console.log(
 	'Redbird based gateway\n' + 
