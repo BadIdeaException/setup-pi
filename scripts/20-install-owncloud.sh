@@ -63,7 +63,7 @@ docker run --detach \
            --name owncloud $IMAGENAME
 
 # Set up owncloud
-docker cp $RESOURCE_LOCATION/owncloud-config.sh owncloud:/tmp/ && docker exec --user www-data   owncloud /bin/bash -c "DATAPATH=\"$DATAPATH\" /tmp/owncloud-config.sh"
+#docker cp $RESOURCE_LOCATION/owncloud-config.sh owncloud:/tmp/ && docker exec --user www-data   owncloud /bin/bash -c "DATAPATH=\"$DATAPATH\" /tmp/owncloud-config.sh"
 
 docker exec --interactive --user www-data \
             owncloud \
