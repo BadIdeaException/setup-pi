@@ -56,8 +56,8 @@ docker build --file "$RESOURCE_LOCATION/owncloud-Dockerfile" \
 docker run --detach \
            --restart=always \
            --network intercontainer \
-           --publish 7080:7080 \
-           --publish 7443:7443 \
+           --publish 80:80 \
+           --publish 443:443 \
            --volume /var/vol/owncloud/data:$DATAPATH \
            --volume /var/vol/owncloud/config:/var/www/owncloud/config \
            --name owncloud $IMAGENAME
