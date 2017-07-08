@@ -25,7 +25,7 @@ if (args.hasOwnProperty('help')) {
 	process.exit();
 }
 
-var sitepath = '/etc/redbird/sites.d/' || args['sitepath']; // Override default site path from command line
+var sitepath = args['sitepath'] || '/etc/redbird/sites.d/'; // Override default site path from command line
 if (!sitepath.endsWith('/')) { sitepath += '/' }; // Make sure there's a trailing slash
 
 var config = JSON.parse(fs.readFileSync(args['config'] || '/etc/redbird/redbird.conf')); // Read configuration from default or overridden config file
