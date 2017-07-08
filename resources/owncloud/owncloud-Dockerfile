@@ -31,7 +31,7 @@ COPY ./owncloud-fix-permissions.sh /tmp
 RUN /tmp/owncloud-fix-permissions.sh
 
 EXPOSE 80 443
-VOLUME $DATAPATH /var/www/owncloud/config
+VOLUME $DATAPATH /var/www/owncloud/config /usr/share/certificates
 
 CMD /usr/local/bin/owncloud-start-server.sh
 
