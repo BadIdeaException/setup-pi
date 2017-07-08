@@ -6,10 +6,10 @@ function processArgs(argArray) {
 	var result = {};
 	argArray
 		.slice(2) // Cut off the first two parameters (node invocation and this script file as an argument to node)
-		.forEach(arg) {
+		.forEach(function(arg) {
 			arg = arg.split('='); // Arguments are in the form option=value, split current one into array [option,value]
 			result[arg[0]] = arg[1];
-		}
+		});
 }
 var args = processArgs(process.argv);
 
@@ -17,7 +17,8 @@ var args = processArgs(process.argv);
 var configpath = '/etc/redbird/sites.d/';
 
 
-console.log('Reading from ' + configpath);
+console.log('Starting Redbird based gateway');
+console.log('Reading sites from ' + configpath);
 
 fs
 	// Read configuration directory
@@ -26,7 +27,7 @@ fs
 	.filter(function(file) { return file.indexOf('.site') !== 0; })
 	// 
 	.forEach(function(file) {
-		var config = require(configpath + '/' + file); // Load a file
+		var config = JSON.parse(fs.readFileSync(configpath + '/' + file)); // Load a file
 		console.log('Registering site ' + config.domain + ' to be proxied to ' + config.target);
 		proxy.register(config.domain, config.target, config.options);
 	});
