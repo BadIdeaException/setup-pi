@@ -1,8 +1,21 @@
 #!/usr/bin/env node
-var proxy = require('redbird')({ port: 80 });
+var proxy = require('redbird')({ port: 80, bunyan: false });
 var fs = require('fs');
 
+function processArgs(argArray) {
+	var result = {};
+	argArray
+		.slice(2) // Cut off the first two parameters (node invocation and this script file as an argument to node)
+		.forEach(arg) {
+			arg = arg.split('='); // Arguments are in the form option=value, split current one into array [option,value]
+			result[arg[0]] = arg[1];
+		}
+}
+var args = processArgs(process.argv);
+
+
 var configpath = '/etc/redbird/sites.d/';
+
 
 console.log('Reading from ' + configpath);
 
@@ -14,6 +27,6 @@ fs
 	// 
 	.forEach(function(file) {
 		var config = require(configpath + '/' + file); // Load a file
-		console.log('Registering site ' + config.domain + ' to be routed to ' + config.target);
+		console.log('Registering site ' + config.domain + ' to be proxied to ' + config.target);
 		proxy.register(config.domain, config.target, config.options);
 	});
