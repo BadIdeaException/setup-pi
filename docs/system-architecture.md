@@ -4,6 +4,9 @@
 
 This script sets up a collection of web services and related infrastructure, which are isolated from each other through the use of docker containers. The containers are able to talk to each other on a network bus called _intercontainer_. All relevant data is stored outside the container (i.e. on the host) in mounted subdirectories under `/var/vol`.
 
+## Intercontainer bus
+
+This is a simple docker network that serves as a bus for communication between containers. It backs both the gateway's distribution of incoming internet requests as well as communication between individual containers (for instance a web server talking to a database server). Host names are container names.
 ```
 +-------------+    
 | Container 1 | ---+
@@ -44,10 +47,6 @@ The gateway listens on all IP addresses on ports 80 and 443.
                                                                   +-------------+
 ```
 See the [Gateway container documentation](doc/gateway.md) on how to add new services.
-
-## Intercontainer bus
-
-This is a simple docker network that serves as a bus for communication between containers. It backs both the gateway's distribution of incoming internet requests as well as communication between individual containers (for instance a web server talking to a database server). Host names are container names.
 
 ## Volumes
 
