@@ -13,5 +13,5 @@ RUN mkdir --parents /etc/redbird/sites.d
 COPY redbird.conf /etc/redbird
 COPY owncloud.site /etc/redbird/sites.d
 
-EXPOSE 80 443
+VOLUME /var/letsencrypt/
 CMD /opt/gateway/gateway.js

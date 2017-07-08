@@ -56,8 +56,6 @@ docker build --file "$RESOURCE_LOCATION/owncloud-Dockerfile" \
 docker run --detach \
            --restart=always \
            --network intercontainer \
-           --publish 80:80 \
-           --publish 443:443 \
            --volume /var/vol/owncloud/data:$DATAPATH \
            --volume /var/vol/owncloud/config:/var/www/owncloud/config \
            --volume /var/vol/gateway/letsencrypt/dinosaurs.privatedns.org:/usr/share/certificates \
