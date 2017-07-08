@@ -10,6 +10,7 @@ RUN cd /opt/gateway && npm install
 
 # Make config directory at /etc/redbird and copy site definitions to it
 RUN mkdir --parents /etc/redbird/sites.d
+COPY redbird.conf /etc/redbird
 COPY owncloud.site /etc/redbird/sites.d
 
 EXPOSE 80 443

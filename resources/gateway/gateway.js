@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-var proxy = require('redbird')({ port: 80, bunyan: false });
 var fs = require('fs');
 
 // Process command line arguments from the original array form into a hash of the form option: value
@@ -15,12 +14,6 @@ var args = function processArgs(argArray) {
 	return result;
 }(process.argv);
 
-var sitepath = '/etc/redbird/sites.d/' || args['sitepath']; // Override default site path from command line
-if (!sitepath.endsWith('/')) { sitepath += '/' };
-
-
-console.log('Redbird based gateway\n');
-
 // Print help text if run with --help
 if (args.hasOwnProperty('help')) {
 	console.log(
@@ -32,7 +25,19 @@ if (args.hasOwnProperty('help')) {
 	process.exit();
 }
 
-console.log('Reading sites from ' + sitepath);
+var sitepath = '/etc/redbird/sites.d/' || args['sitepath']; // Override default site path from command line
+if (!sitepath.endsWith('/')) { sitepath += '/' }; // Make sure there's a trailing slash
+
+var config = JSON.parse(fs.readFileSync(args['config'] || '/etc/redbird/redbird.conf')); // Read configuration from default or overridden config file
+config.bunyan = config.bunyan || false; // Default bunyan logging to false unless specifically overridden
+
+console.log(
+	'Redbird based gateway\n' + 
+	'\n' +
+	'Reading sites from ' + sitepath
+);
+
+var proxy = require('redbird')(config);
 
 fs
 	// Read configuration directory
