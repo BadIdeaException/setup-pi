@@ -17,7 +17,7 @@ echo "deb https://apt.dockerproject.org/repo raspbian-jessie main" > /etc/apt/so
 apt-get update
 
 # Make sure docker package will be pulled from the repo
-if [ ! $(apt-cache policy docker-engine | grep dockerproject.org) ]; then
+if ! [[ $(apt-cache policy docker-engine | grep dockerproject.org) ]]; then
     echo "There was an error setting up the docker repo. Aborting."
     exit 1
 fi
