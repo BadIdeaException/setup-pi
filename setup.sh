@@ -20,11 +20,8 @@ apt-get -y update && apt-get -y upgrade
 # Create a network for inter-container communication
 docker network create intercontainer
 
-# Install an apache server to act as a gateway
+# Install a redbird-based gateway
 ./scripts/20-install-gateway.sh
-
-# Install certbot to enable Let's Encrypt certificates
-./scripts/20-install-certbot.sh
 
 # Install mysql
 ./scripts/20-install-mysql.sh

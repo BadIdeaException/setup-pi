@@ -18,10 +18,6 @@ RUN a2ensite owncloud
 # Enable apache2 modules
 RUN a2enmod rewrite && a2enmod headers && a2enmod env && a2enmod dir && a2enmod mime
 
-# Create selfsigned certificate. Need to replace this with Let's Encrypt
-RUN make-ssl-cert generate-default-snakeoil
-RUN a2enmod ssl
-
 COPY ./owncloud-start-server.sh /usr/local/bin/
 
 # Move data directory outside of the www directory for security reasons
