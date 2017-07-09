@@ -46,7 +46,7 @@ The gateway listens on all IP addresses on ports 80 and 443.
                                                             +---> | Container 3 |
                                                                   +-------------+
 ```
-See the [Gateway container documentation](doc/gateway.md) on how to add new services.
+See the [Gateway container documentation](gateway.md) on how to add new services.
 
 ## Volumes
 
