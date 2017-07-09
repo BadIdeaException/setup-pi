@@ -5,7 +5,7 @@
 		"ssl": {
 			"letsencrypt": {
 				"email": "tigerman33@gmx.net",
-				"production": false
+				"production": true
 			}
 		}
 	}
