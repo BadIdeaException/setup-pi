@@ -1,0 +1,4 @@
+#!/bin/bash
+#
+# Simple wrapper script to make invocation of the Duplicati command line tool a little more "linuxy"
+/usr/bin/mono /apps/duplicati/Duplicati.CommandLine.exe "$@"
