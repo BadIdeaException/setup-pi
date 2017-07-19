@@ -8,7 +8,14 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
-docker pull lsioarmhf/duplicati
+# Path to resources folder
+SCRIPT=$(readlink -f "$0")
+RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources/mysql
+
+docker build --file "$RESOURCE_LOCATION/duplicati-Dockerfile" \
+			--tag "chrissrv/duplicati:1.0" \
+			"$RESOURCE_LOCATION"
+
 
 if [ ! $TARGET_URL ]; then
 	echo "Specify the URL to store backups to.\nThis should be in the format \"protocol://username:password@host:port/path\"\nRun this image with the help backup option for more help."
@@ -23,4 +30,4 @@ docker run --detach \
 	--volume /var/vol/duplicati/config:/config \
 	--name duplicati \
 	--env TARGET_URL=$TARGET_URL \
-	lsioarmhf/duplicati
+	chrissrv/duplicati:1.0
