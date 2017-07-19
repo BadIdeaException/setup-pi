@@ -17,17 +17,20 @@ docker build --file "$RESOURCE_LOCATION/duplicati-Dockerfile" \
 			"$RESOURCE_LOCATION"
 
 
-if [ ! $TARGET_URL ]; then
-	echo "Specify the URL to store backups to.\nThis should be in the format \"protocol://username:password@host:port/path\"\nRun this image with the help backup option for more help."
-	while [ ! $TARGET_URL ] do
-		read "Enter a URL: " TARGET_URL
+# Read target url if not already set on the system. Keep reading until not empty.
+if [ ! $DUPLICATI_TARGET_URL ]; then
+	echo -e "Specify the URL to store backups to. \n This should be in the format \"protocol://username:password@host:port/path\"\nRun this image with the help backup option for more help." # -e: Enable \n for newline
+	while [ ! $DUPLICATI_TARGET_URL ]; do
+		read -p "Enter a URL: " DUPLICATI_TARGET_URL # -p: Specify prompt
 	done
+   # Persist this variable
+	echo "DUPLICATI_TARGET_URL=$DUPLICATI_TARGET_URL" >> /etc/environment
 fi
 
 docker run --detach \
-	--rm
+	--rm \
 	--volume /var/vol/:/source \
 	--volume /var/vol/duplicati/config:/config \
 	--name duplicati \
-	--env TARGET_URL=$TARGET_URL \
+	--env TARGET_URL=$DUPLICATI_TARGET_URL \
 	chrissrv/duplicati:1.0
