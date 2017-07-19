@@ -4,5 +4,5 @@ FROM lsioarmhf/duplicati
 # the Linux-friendly "duplicati-cli" instead of the clumsier "mono /apps/duplicati/Duplicati.CommandLine.exe"
 COPY ./duplicati-cli /usr/local/bin
 
-CMD ["$TARGET_URL", "/source"]
+CMD ["backup", $TARGET_URL", "/source", "--passphrase=$PASSPHRASE"]
 ENTRYPOINT ["/usr/local/bin/duplicati-cli"]

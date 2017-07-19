@@ -27,10 +27,11 @@ if [ ! $DUPLICATI_TARGET_URL ]; then
 	echo "DUPLICATI_TARGET_URL=$DUPLICATI_TARGET_URL" >> /etc/environment
 fi
 
-docker run --detach \
+docker run \
 	--rm \
 	--volume /var/vol/:/source \
 	--volume /var/vol/duplicati/config:/config \
 	--name duplicati \
 	--env TARGET_URL=$DUPLICATI_TARGET_URL \
+	--env PASSPHRASE="" \
 	chrissrv/duplicati:1.0
