@@ -10,7 +10,7 @@ fi
 
 # Path to resources folder
 SCRIPT=$(readlink -f "$0")
-RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources/mysql
+RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources/duplicati
 
 docker build --file "$RESOURCE_LOCATION/duplicati-Dockerfile" \
 			--tag "chrissrv/duplicati:1.0" \
