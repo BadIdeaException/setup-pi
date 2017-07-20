@@ -4,5 +4,7 @@ FROM lsioarmhf/duplicati
 # the Linux-friendly "duplicati-cli" instead of the clumsier "mono /apps/duplicati/Duplicati.CommandLine.exe"
 COPY ./duplicati-cli /usr/local/bin
 
-CMD ["backup", $TARGET_URL", "/source", "--passphrase=$PASSPHRASE"]
-ENTRYPOINT ["/usr/local/bin/duplicati-cli"]
+ENV TARGET_URL $TARGET_URL
+ENV PASSPHRASE $PASSPHRASE
+
+CMD /usr/local/bin/duplicati-cli backup $TARGET_URL /source --passphrase=$PASSPHRASE
