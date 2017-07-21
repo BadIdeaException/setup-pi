@@ -8,4 +8,4 @@ COPY ./run-backups.sh /usr/local/bin
 ENV TARGET_URL $TARGET_URL
 ENV PASSPHRASE $PASSPHRASE
 
-CMD /usr/local/bin/run-backups
+CMD /usr/local/bin/run-backups.sh
