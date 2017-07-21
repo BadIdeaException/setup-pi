@@ -9,17 +9,18 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Path to resources folder
+IMAGENAME="chrisrv/duplicati:1.0"
 SCRIPT=$(readlink -f "$0")
 RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources/duplicati
 
 docker build --file "$RESOURCE_LOCATION/duplicati-Dockerfile" \
-			--tag "chrissrv/duplicati:1.0" \
+			--tag $IMAGENAME \
 			"$RESOURCE_LOCATION"
 
 
 # Read target url if not already set on the system. Keep reading until not empty.
 if [ ! $DUPLICATI_TARGET_URL ]; then
-	echo -e "Specify the URL to store backups to. \n This should be in the format \"protocol://username:password@host:port/path\"\nRun this image with the help backup option for more help." # -e: Enable \n for newline
+	echo -e "Specify the URL to store backups to. \n This should be in the format \"protocol://username:password@host:port/path\"\nDo docker run \"$IMAGENAME duplicati-cli help backup\" for more help." # -e: Enable \n for newline
 	while [ ! $DUPLICATI_TARGET_URL ]; do
 		read -p "Enter a URL: " DUPLICATI_TARGET_URL # -p: Specify prompt
 	done
@@ -34,4 +35,8 @@ docker run \
 	--name duplicati \
 	--env TARGET_URL=$DUPLICATI_TARGET_URL \
 	--env PASSPHRASE="" \
-	chrissrv/duplicati:1.0
+	$IMAGENAME
+
+# Add a cronjob to run backups every night at 2:00 a.m.
+# For details see https://stackoverflow.com/a/9625233/3315731
+(crontab -l 2>/dev/null; echo "0 2 * * * docker run --rm --volume /var/vol:/source --volume /var/vol/duplicati/config:/config --name duplicati --env TARGET_URL=$DUPLICATI_TARGET_URL --env PASSPHRASE=\"\" $IMAGENAME") | crontab -
