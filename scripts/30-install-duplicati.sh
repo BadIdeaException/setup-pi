@@ -13,6 +13,8 @@ IMAGENAME="chrisrv/duplicati:1.0"
 SCRIPT=$(readlink -f "$0")
 RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources/duplicati
 
+mkdir --parents /var/vol/duplicati/config
+
 docker build --file "$RESOURCE_LOCATION/duplicati-Dockerfile" \
 			--tag $IMAGENAME \
 			"$RESOURCE_LOCATION"
