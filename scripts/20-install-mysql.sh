@@ -26,7 +26,5 @@ docker run --detach \
 		   --restart=always \
 		   --network intercontainer \
 		   --env MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
-		   --volume /var/vol/mysql/dumps:/backups \
-		   --name mysql hypriot/rpi-mysql
-
-cp $RESOURCE_LOCATION/mysql-dump.sh /etc/cron.daily
+		   --volume /var/vol/mysql/mysql:/var/lib/mysql \
+         --name mysql hypriot/rpi-mysql
