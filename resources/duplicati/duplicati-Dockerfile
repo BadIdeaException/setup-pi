@@ -7,4 +7,4 @@ COPY ./duplicati-cli /usr/local/bin
 ENV TARGET_URL $TARGET_URL
 ENV PASSPHRASE $PASSPHRASE
 
-CMD /usr/local/bin/duplicati-cli backup $TARGET_URL /source --passphrase=$PASSPHRASE
+CMD /usr/local/bin/run-backups
