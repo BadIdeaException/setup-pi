@@ -9,7 +9,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Path to resources folder
-IMAGENAME="chrisrv/duplicati:1.0"
+IMAGENAME="chrissrv/duplicati:1.0"
 SCRIPT=$(readlink -f "$0")
 RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources/duplicati
 
