@@ -38,5 +38,6 @@ docker run \
 	$IMAGENAME
 
 # Add a cronjob to run backups every night at 2:00 a.m.
-# For details see https://stackoverflow.com/a/9625233/3315731
-(crontab -l 2>/dev/null; echo "0 2 * * * docker run --rm --volume /var/vol:/source --volume /var/vol/duplicati/config:/config --name duplicati --env TARGET_URL=$DUPLICATI_TARGET_URL --env PASSPHRASE=\"\" $IMAGENAME") | crontab -
+# For details see https://stackoverflow.com/a/9625233/3315731 and https://stackoverflow.com/a/17975418/3315731
+CRONCMD="0 2 * * * docker run --rm --volume /var/vol:/source --volume /var/vol/duplicati/config:/config --name duplicati --env TARGET_URL=$DUPLICATI_TARGET_URL --env PASSPHRASE=\"\" $IMAGENAME"
+(crontab -l 2>/dev/null | grep -v -F $CRONCMD ; echo $CRONCMD) | crontab -
