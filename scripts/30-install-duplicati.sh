@@ -9,38 +9,23 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Path to resources folder
-IMAGENAME="chrissrv/duplicati:1.0"
 SCRIPT=$(readlink -f "$0")
 RESOURCE_LOCATION=$(dirname "$SCRIPT")/../resources/duplicati
 
 mkdir --parents /var/vol/duplicati/config
 
-docker build --file "$RESOURCE_LOCATION/duplicati-Dockerfile" \
-			--tag $IMAGENAME \
-			"$RESOURCE_LOCATION"
+docker pull lsioarmhf/duplicati:latest
 
-
-# Read target url if not already set on the system. Keep reading until not empty.
-if [ ! $DUPLICATI_TARGET_URL ]; then
-	echo -e "Specify the URL to store backups to. \n This should be in the format \"protocol://username:password@host:port/path\"\nDo docker run \"$IMAGENAME duplicati-cli help backup\" for more help." # -e: Enable \n for newline
-	while [ ! $DUPLICATI_TARGET_URL ]; do
-		read -p "Enter a URL: " DUPLICATI_TARGET_URL # -p: Specify prompt
-	done
-   # Persist this variable
-	echo "DUPLICATI_TARGET_URL=$DUPLICATI_TARGET_URL" >> /etc/environment
-fi
-
-# Add a cronjob to run backups every night at 2:00 a.m.
-# For details see https://stackoverflow.com/a/9625233/3315731 and https://stackoverflow.com/a/17975418/3315731
-CRONCMD="0 2 * * * docker run --rm --volume /var/vol:/source --volume /var/vol/duplicati/config:/config --name duplicati --env TARGET_URL=$DUPLICATI_TARGET_URL --env PASSPHRASE=\"\" $IMAGENAME"
-(crontab -l 2>/dev/null | grep -v -F "$CRONCMD" ; echo "$CRONCMD") | crontab -
-
+# Need to run with PUID=0 to make the added capability work
 docker run \
-	--rm \
-	--volume /var/vol/:/source \
-	--volume /var/vol/duplicati/config:/config \
-	--name duplicati \
-	--env TARGET_URL=$DUPLICATI_TARGET_URL \
-	--env PASSPHRASE="" \
-	$IMAGENAME
+	--detach \
+	--restart=always \
+	--volume /var/vol:/source \
+	--volume /var/vol/duplicati/:/config \
+	--env PUID=0 \
+	--add-cap=DAC_READ_SEARCH \
+	--publish 8200:8200
+	--name duplicati
+	lsioarmhf/duplicati
 
+echo "Visit this server at port 8200 to configure backups"
