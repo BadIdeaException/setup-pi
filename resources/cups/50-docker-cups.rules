@@ -1,0 +1,3 @@
+# When printer is turned on or connected (as matched by vendor&product id), symlink device to /dev/printer and start container
+# FIXME: Script will currently not execute for whatever reason
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="04e8", ATTRS{idProduct}=="3456", SYMLINK+="printer", RUN+="docker start cups"
