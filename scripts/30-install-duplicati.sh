@@ -16,7 +16,7 @@ mkdir --parents /var/vol/duplicati/config
 
 docker pull lsioarmhf/duplicati:latest
 
-# Need to run with PUID=0 to make the added capability work
+# Need to run with PUID=0 (execute as container root) to make the added capability work
 docker run \
 	--detach \
 	--restart=always \
