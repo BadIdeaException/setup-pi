@@ -21,7 +21,7 @@ docker run \
 	--volume=/var/vol/tvheadend/recordings:/recordings \
 	--net=host \
 	--device=/dev/dvb \
-	--env PUID=$(stat -c %u /dev/dvb/adapter0/frontend0) \
+	--env PGID=$(stat -c %u /dev/dvb/adapter0/frontend0) \
 	--name=tvheadend \
 	lsioarmhf/tvheadend
 
