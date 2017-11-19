@@ -17,6 +17,7 @@ mkdir --parents /var/vol/tvheadend/recordings
 # Also, to enable use of the dvb usb stick, run with group id owning the adapter's subdevices
 docker run \
 	--detach \
+	--restart=always \
 	--volume=/var/vol/tvheadend/config:/config \
 	--volume=/var/vol/tvheadend/recordings:/recordings \
 	--net=host \
