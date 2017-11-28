@@ -23,9 +23,20 @@ docker build \
 
 # Find the printer and get its major number. We'll need it for the cgroup rule
 read -p "Please connect and turn on the printer. Press ENTER when finished."
-while [ ! $PRINTERDEVICE ] do
-   read -p "Please enter the full path to the printer device (probably /dev/usb/lp0): " PRINTERDEVICE
-   MAJOR=$(echo $((0x$(stat -c "%t" "$PRINTERDEVICE"))) # Convert to decimal using echo
+while [ ! $PRINTERDEVICE ]; do
+   read -p "Please enter the full path to the printer device (probably /dev/usb/lp0). Press ENTER on an empty input to see a list of all printers. " PRINTERDEVICE
+   if [ -z $PRINTERDEVICE ]
+   then
+      LIST=$(find /dev/ -name lp*)
+      if [ -z "$LIST" ]
+      then
+         echo "No printers were found. Are you sure it's connected and turned on?"
+      else
+         echo $LIST
+      fi
+   else
+      MAJOR=$(echo $((0x$(stat -c "%t" "$PRINTERDEVICE")))) # Convert to decimal using echo
+   fi
 done
 
 docker run --detach \
