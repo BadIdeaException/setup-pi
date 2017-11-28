@@ -24,8 +24,8 @@ docker run \
 	--volume /var/vol/duplicati/:/config \
 	--env PUID=0 \
 	--add-cap=DAC_READ_SEARCH \
-	--publish 8200:8200
-	--name duplicati
+	--publish 8200:8200 \
+	--name duplicati \
 	lsioarmhf/duplicati
 
 echo "Visit this server at port 8200 to configure backups"
