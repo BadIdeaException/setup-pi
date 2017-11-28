@@ -8,7 +8,8 @@ This script sets up a collection of web services and related infrastructure, whi
 - a MySQL database server backing the Owncloud, but potentially open to other services as well,
 - a [gateway](gateway.md) facilitating domain-based HTTP(S) proxying,
 - a [Tvheadend](tvheadend.md) server distributing the TV signal into the LAN,
-- a Duplicati installation responsible for backing up the other services' data.
+- a Duplicati installation responsible for backing up the other services' data,
+- a CUPS print server.
 
 The containers are able to talk to each other on a network bus called _intercontainer_. All relevant data is stored outside the container (i.e. on the host) in mounted subdirectories under `/var/vol`. 
 
