@@ -1,0 +1,15 @@
+FROM resin/rpi-raspbian
+
+RUN apt-get update && apt-get install -y cups avahi-daemon curl build-essential libcups2-dev libavahi-client-dev git bzr
+
+# Samsung provides Linux drivers, however not for the armhf architecture
+# But we can extract the PPD (Postscript Printer Definition) file from the regular Linux drivers, and use this with CUPS. 
+# Therefore, download and extract the Linux driver installer, and copy the PPD file into the appropriate CUPS folder.
+RUN curl http://www.samsungsetup.com/TS/Files/RDS_XML/web_install_agent/linux/SamsungPrinterInstaller.tar.gz | tar --gzip --extract --directory=/usr/share/cups/model --strip-components=4 uld/noarch/share/ppd/Samsung_CLX-3300_Series.ppd
+
+# Allow file:// URIs as device descriptors in lpadmin
+RUN echo "FileDevice yes" >> /etc/cups/cups-files.conf
+# Add the printer to CUPS
+RUN /usr/sbin/lpadmin -p "Samsung_CLX-3305" -E -v file:///dev/usb/lp0 -m Samsung_CLX-3300_Series.ppd
+
+RUN mkdir -p /opt && export GOROOT=/opt/go && curl https://storage.googleapis.com/golang/go1.8.3.linux-armv6l.tar.gz | tar --extract --gzip --directory=/opt && 
