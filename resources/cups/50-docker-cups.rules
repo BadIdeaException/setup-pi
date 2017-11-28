@@ -2,4 +2,4 @@
 ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="04e8", ATTRS{idProduct}=="3456", RUN="/usr/local/bin/container-manage-devices add cups /dev/usb/lp0"
 
 # When printer is turned off or disconnected, execute script to remove device file in container
-ACTION=="remove", SUBSYSTEM=="usb", ENV{idVendor}=="04e8", ENV{idProduct}=="3456", RUN="/usr/local/bin/container-manage-devices rm cups /dev/usb/lp0"
+ACTION=="remove", SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="04e8", ENV{ID_MODEL_ID}=="3456", RUN="/usr/local/bin/container-manage-devices rm cups /dev/usb/lp0"
