@@ -1,0 +1,14 @@
+FROM hypriot/rpi-alpine-scratch
+MAINTAINER chris
+
+# Install cups
+RUN apk update \
+	&& apk install cups \
+
+# Create cups user to lpadmin group
+	&& useradd -H cups \
+	&& adduser cups lpadmin lp
+
+# -f: Run in cups in foreground
+USER cups
+ENTRYPOINT /usr/sbin/cupsd -f 
