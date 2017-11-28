@@ -21,11 +21,19 @@ docker build \
          --tag "$IMAGENAME" \
          "$RESOURCE_LOCATION"
 
+# Find the printer and get its major number. We'll need it for the cgroup rule
+read -p "Please connect and turn on the printer. Press ENTER when finished."
+while [ ! $PRINTERDEVICE ] do
+   read -p "Please enter the full path to the printer device (probably /dev/usb/lp0): " PRINTERDEVICE
+   MAJOR=$(echo $((0x$(stat -c "%t" "$PRINTERDEVICE"))) # Convert to decimal using echo
+done
+
 docker run --detach \
          --restart=always \
          --network intercontainer \      
          --publish 631:631 \ 
          --volume /var/vol/cups/:/etc/cups \
+         --device-cgroup-rule "c $MAJOR:* rmw" \
          --name cups \
          $IMAGENAME
 
