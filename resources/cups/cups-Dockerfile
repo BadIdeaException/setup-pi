@@ -1,11 +1,14 @@
 FROM hypriot/rpi-alpine-scratch
 MAINTAINER chris
 
+# It might make sense to create the lpadmin and lp groups beforehand and give them the same
+# GIDs as the host to avoid permission issues
+
 # Install cups
 RUN apk update \
 	&& apk install cups \
 
-# Create cups user to lpadmin group
+# Create cups user and add to lpadmin group
 	&& useradd -H cups \
 	&& adduser cups lpadmin lp
 
