@@ -3,7 +3,8 @@
 # Wrapper script to allow invocation of all util commands using chrissrv <COMMANDNAME> <ARGUMENTS...>
 
 function check_command() {
-	if [ -z "$1" ]
+	# If parameter is a directory, no command was given at all
+	if [ -d "$1" ]
 	then
 		echo "No command specified"
 		exit 1
