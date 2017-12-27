@@ -7,6 +7,12 @@ CONTAINER=$2
 DEV=$3
 
 function add_device() {
+	# Check that device exists and is a character device
+	if [ ! -e $DEV ] || [ ! -c $DEV ]
+	then
+		exit 1
+	fi
+
 	MAJOR=$(echo $((0x$(stat -c "%t" "$DEV")))) # Get major number and convert to decimal with echo
 	MINOR=$(echo $((0x$(stat -c "%T" "$DEV")))) # Get minor number and convert to decimal with echo
 	MODE=$(stat -c "%a" "$DEV") # Get device file permissions
