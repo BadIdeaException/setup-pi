@@ -1,10 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Helper script to execute a command (param 2) after a delay (param 1)
-# Mainly meant to allow for udev scripts to be delayed
+# Useful for delaying udev scripts
 
 DELAY=$1
 CMD=$2
+shift 2 # Shift delay and cmd out of arguments
 
 sleep $DELAY
-$(CMD) & disown
+exec "$CMD" "$@" & disown
