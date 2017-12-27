@@ -1,0 +1,6 @@
+#!/bin/bash
+# Helper script to remove all containers that have exited
+# This is meant to help with clean up, rather than having to do everything by hand. That'd be rather cumbersome ;-)
+#
+# Taken from https://www.digitalocean.com/community/tutorials/how-to-remove-docker-images-containers-and-volumes
+docker rm $(docker ps -a -f status=exited)
