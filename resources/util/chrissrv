@@ -2,16 +2,23 @@
 #
 # Wrapper script to allow invocation of all util commands using chrissrv <COMMANDNAME> <ARGUMENTS...>
 
+function get_command() {
+	# Get directory of command script
+	# Use realpath to resolve symbolic links first
+	local DIRNAME=$(dirname $(realpath $0))
+	return "$DIRNAME/$1"
+}
+
 function check_command() {
-	local DIRNAME=$(dirname $0)
-	if [ -e "$1" ]
+	if [ ! -e "$1" ]
 	then
-		echo "Unknown command: $1"
+		echo "Unknown command: $(basename $1)"
 		exit 1
 	fi
 }
 
+CMD=get_command "$1"
 check_command "$1"
-CMD="$1"
+
 shift # Remove <COMMANDNAME> from arguments
 exec "$CMD" "$@"
