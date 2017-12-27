@@ -21,11 +21,11 @@ function add_device() {
 	docker exec $CONTAINER /bin/bash -c "mkdir -p $(dirname $DEV) \
 		&& mknod -m $MODE $DEV c $MAJOR $MINOR \
 		&& chgrp $GID $DEV \
-		&& echo $(date --rfc-3339=seconds): Character device $DEV created as (major:minor) $MAJOR:$MINOR with owner root:$GID and permissions $MODE >> /var/log/dynamic-devices.log"
+		&& echo \"$(date --rfc-3339=seconds): Character device $DEV created as (major:minor) $MAJOR:$MINOR with owner root:$GID and permissions $MODE\" >> /var/log/dynamic-devices.log"
 }
 
 function rm_device() {
-	docker exec $CONTAINER /bin/bash -c "rm $DEV && echo $(date --rfc-3339=seconds): Device $DEV removed >> /var/log/dynamic-devices.log"
+	docker exec $CONTAINER /bin/bash -c "rm $DEV && echo \"$(date --rfc-3339=seconds): Device $DEV removed\" >> /var/log/dynamic-devices.log"
 }
 
 function print_usage() {
