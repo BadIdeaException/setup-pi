@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# Helper script to execute a command (param 2) after a delay (param 1)
+# Mainly meant to allow for udev scripts to be delayed
+
+DELAY=$1
+CMD=$2
+
+sleep $DELAY
+$(CMD) & disown
