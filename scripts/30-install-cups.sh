@@ -48,9 +48,6 @@ docker run --detach \
          --name cups \
          $IMAGENAME
 
-# Install script to handle ephemeral device addition and removal in containers
-cp $RESOURCE_LOCATION/container-manage-devices /usr/local/bin
-
 # Install udev rule
-cp $RESOURCE_LOCATION/50-docker-cups.rules /etc/udev/rules.d/
+cp $RESOURCE_LOCATION/99-docker-cups.rules /etc/udev/rules.d/
 udevadm control --reload
