@@ -18,7 +18,11 @@ function add_device() {
 	MODE=$(stat -c "%a" "$DEV") # Get device file permissions
 	GID=$(stat -c "%g" "$DEV") # Get device file group id
 
+	# Check if device node already exists and rm to prevent mknod from erroring out
+	# TODO Find out why there still seems to be double execution and fix it! It almost looks like an old version of 
+	# the udev rule and/or script are still floating around 
 	docker exec $CONTAINER /bin/bash -c "mkdir -p $(dirname $DEV) \
+		&& if [ -e $DEV ]; then echo \"$(date --rfc-3339=seconds): WARNING: Device $DEV already exists, will be replaced\" >> /var/log/dynamic-devices.log; rm $DEV; fi \
 		&& mknod -m $MODE $DEV c $MAJOR $MINOR \
 		&& chgrp $GID $DEV \
 		&& echo \"$(date --rfc-3339=seconds): Character device $DEV created as (major:minor) $MAJOR:$MINOR with owner root:$GID and permissions $MODE\" >> /var/log/dynamic-devices.log"
