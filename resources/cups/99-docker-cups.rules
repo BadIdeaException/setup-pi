@@ -1,0 +1,6 @@
+# When printer is turned on or connected (as matched by vendor&product id), execute script to create device file in container
+# Execute delayed to allow for permissions and group ownership to be set first
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="04e8", ATTRS{idProduct}=="3456", RUN+="/usr/bin/chrissrv execute-delayed 0.1 /usr/share/chrissrv/container-manage-devices add cups /dev/usb/lp0"
+
+# When printer is turned off or disconnected, execute script to remove device file in container
+ACTION=="remove", SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="04e8", ENV{ID_MODEL_ID}=="3456", RUN+="/usr/bin/chrissrv container-manage-devices rm cups /dev/usb/lp0"
