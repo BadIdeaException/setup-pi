@@ -26,7 +26,13 @@ Vagrant.configure(2) do |config|
     /usr/sbin/groupadd --system gpio
     /usr/sbin/groupadd --system i2c
     /usr/sbin/groupadd --system spi
-    /usr/sbin/useradd --groups adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,gpio,i2c,spi --password $(echo raspberry | mkpasswd -m sha-512 -s) pi
+    /usr/sbin/useradd \
+      --groups adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,gpio,i2c,spi \
+      --password $(echo raspberry | mkpasswd -m sha-512 -s) \
+      --create-home \
+      --shell /bin/bash \
+      --user-group \
+      pi
   SHELL
 
   # Install ansible
