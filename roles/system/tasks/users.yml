@@ -1,0 +1,33 @@
+---
+
+# Sets up a new user account, prompting the user for a username and password
+# Then deletes the default "pi" user for security reasons
+
+- hosts: all
+  become: yes
+  become_user: root
+
+  vars_prompt:
+  - name: "username"
+    prompt: "Enter user name"
+    private: no
+  - name: "password"
+    prompt: "Enter password"
+    private: yes
+    confirm: yes
+
+  tasks:
+  - name: Create new user
+    user:
+      name: "{{ username }}"
+      password: "{{ password | password_hash('sha512') }}"
+      groups: "adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,gpio,i2c,spi" # as per raspbian jessie
+      append: yes
+      shell: /bin/bash
+      update_password: on_create
+      state: present
+
+  - name: Delete default user pi
+    user:
+      name: pi
+      state: absent
