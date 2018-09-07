@@ -1,11 +1,11 @@
 ---
-# Install dockerized mysql
-# For more information see https://github.com/hypriot/rpi-mysql
+# Install dockerized mariadb
+# For more information see 
+# 	- https://hub.docker.com/r/linuxserver/mariadb
+#		- https://hub.docker.com/r/lsioarmhf/mariadb
 
-- name: Install dockerized mysql
+- name: Install dockerized mariadb
 	hosts: all
-	vars:
-		image: hypriot/rpi-mysql
 
 	vars_prompt:
 		- name: "mysql_root_password"
@@ -14,10 +14,12 @@
 			confirm: yes
 			
 	tasks:
+	- include_vars: "{{ ansible_architecture }}.yml"
+
 	- name: Create volumes
 		file:
-			path: "{{ volume_basedir }}/mysql/mysql"
+			path: "{{ volume_basedir }}/mariadb/data"
 			
 	- name: Pull image
 		docker_image:
-			name:	"{{ image }}"
+			name:	"{{ lsio_prefix }}/mariadb"

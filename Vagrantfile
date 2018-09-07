@@ -14,6 +14,17 @@ Vagrant.configure(2) do |config|
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "debian/jessie64"
 
+  # Configure vagrant-cachier to cache apt installs across box incarnations
+  # This is optional, but will greatly increase speed if the vm has to be repeatedly
+  # destroyed and recreated.
+  # Run "vagrant plugin install vagrant-cachier" to install.
+  # For more information see https://github.com/fgrehm/vagrant-cachier
+  if Vagrant.has_plugin?("vagrant-cachier")
+    # Configure cached packages to be shared between instances of the same base box.
+    # More info on the "Usage" link above
+    config.cache.scope = :box
+  end
+
   # Forward ports 7080 and 7443
   config.vm.network "forwarded_port", guest: 7080, host: 7080
   config.vm.network "forwarded_port", guest: 7443, host: 7443
