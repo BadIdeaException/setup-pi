@@ -1,0 +1,23 @@
+---
+# Install dockerized mysql
+# For more information see https://github.com/hypriot/rpi-mysql
+
+- name: Install dockerized mysql
+	hosts: all
+	vars:
+		image: hypriot/rpi-mysql
+
+	vars_prompt:
+		- name: "mysql_root_password"
+			prompt: "Enter the mysql root password"
+			private: yes
+			confirm: yes
+			
+	tasks:
+	- name: Create volumes
+		file:
+			path: "{{ volume_basedir }}/mysql/mysql"
+			
+	- name: Pull image
+		docker_image:
+			name:	"{{ image }}"
