@@ -1,2 +1,4 @@
 /.vagrant/
 *.retry
+.bash_history
+.cache/
