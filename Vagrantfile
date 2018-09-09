@@ -26,8 +26,8 @@ Vagrant.configure(2) do |config|
   end
 
   # Forward ports 7080 and 7443
-  config.vm.network "forwarded_port", guest: 7080, host: 7080
-  config.vm.network "forwarded_port", guest: 7443, host: 7443
+  config.vm.network "forwarded_port", guest: 80, host: 7080
+  config.vm.network "forwarded_port", guest: 443, host: 7443
 
   # Mount source folder in vm
   config.vm.synced_folder ".", "/mnt/setup-pi"
