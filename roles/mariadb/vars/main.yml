@@ -1,0 +1,4 @@
+image_name: "{{ { 
+  'armv7l': 'lsioarmhf/mariadb', 
+  'x86_64': 'linuxserver/mariadb' 
+}[ansible_architecture] }}"

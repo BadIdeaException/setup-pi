@@ -4,131 +4,118 @@
 #   - https://hub.docker.com/r/linuxserver/nextcloud
 #   - https://hub.docker.com/r/lsioarmhf/nextcloud
 
-- name: Install dockerized nextcloud
-  hosts: all
-  become: yes
-  become_user: root
+# Get the user and group ids of the www-data user. We will pass them into
+# the container to avoid permission issues with the volumes.
+# The values are read from passwd and then set as facts.
+# Can't use lookup('pipe') here because that would perform the lookup on
+# the local machine, not the remote. 
+- name: Get UID and GID of user www-data
+  getent:
+    database: passwd
+    key: "www-data"
+  register: passwd_line
+  tags:
+    - config
+    - run
+  
+- set_fact:
+    uid: "{{ passwd_line.ansible_facts.getent_passwd['www-data'][1] }}"
+    gid: "{{ passwd_line.ansible_facts.getent_passwd['www-data'][2] }}"
+  tags:
+    - config
+    - run
 
-  vars:
-    image_name: "{{ { 
-      'armv7l': 'lsioarmhf/nextcloud', 
-      'x86_64': 'linuxserver/nextcloud' 
-    }[ansible_architecture] }}"
-
-  tasks:
-
-  # Get the user and group ids of the www-data user. We will pass them into
-  # the container to avoid permission issues with the volumes.
-  # The values are read from passwd and then set as facts.
-  # Can't use lookup('pipe') here because that would perform the lookup on
-  # the local machine, not the remote. 
-  - name: Get UID and GID of user www-data
-    getent:
-      database: passwd
-      key: "www-data"
-    register: passwd_line
-    tags:
-      - config
-      - run
+- name: Create volumes
+  file:
+    path: "{{ volume_basedir }}/nextcloud/{{ item }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: 0755 # leading zero means it's octal
+  with_items:
+    - config
+    - data
     
-  - set_fact:
-      uid: "{{ passwd_line.ansible_facts.getent_passwd['www-data'][1] }}"
-      gid: "{{ passwd_line.ansible_facts.getent_passwd['www-data'][2] }}"
-    tags:
-      - config
-      - run
+- name: Pull image
+  docker_image:
+    name: "{{ image_name }}"
 
-  - name: Create volumes
-    file:
-      path: "{{ volume_basedir }}/nextcloud/{{ item }}"
-      state: directory
-      owner: www-data
-      group: www-data
-      mode: 0755 # leading zero means it's octal
-    with_items:
-      - config
-      - data
-      
-  - name: Pull image
-    docker_image:
-      name: "{{ image_name }}"
+- name: Run container
+  docker_container:
+    detach: yes
+    image: "{{ image_name }}"
+    name: nextcloud
+    env:
+      PUID: "{{ uid }}"
+      PGID: "{{ gid }}"
+    ports: 
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "{{ volume_basedir }}/nextcloud/config:/config"
+      - "{{ volume_basedir }}/nextcloud/data:/data"
+    networks:
+      - { name: intercontainer }
+    restart_policy: always
+  tags:
+    - run
 
-  - name: Run container
-    docker_container:
-      detach: yes
-      image: "{{ image_name }}"
-      name: nextcloud
-      env:
-        PUID: "{{ uid }}"
-        PGID: "{{ gid }}"
-      ports: 
-        - "80:80"
-        - "443:443"
-      volumes:
-        - "{{ volume_basedir }}/nextcloud/config:/config"
-        - "{{ volume_basedir }}/nextcloud/data:/data"
-      networks:
-        - { name: intercontainer }
-      restart_policy: always
-    tags:
-      - run
+- name: Check all required configuration data is available
+  assert:
+    that: "{{ item }} is defined"
+    msg: "The {{ item }} is not set."
+    success_msg: "Variable {{ item }} exists"
+  with_items:
+    - mysql_root_password
+    - nextcloud_admin_user
+    - nextcloud_admin_password
+  tags:
+    - config
 
-  - name: Check all required configuration data is available
-    assert:
-      that: "{{ item }} is defined"
-      msg: "The {{ item }} is not set."
-      success_msg: "Variable {{ item }} exists"
-    with_items:
-      - mysql_root_password
-      - nextcloud_admin_user
-      - nextcloud_admin_password
-    tags:
-      - config
+# The nextcloud container downloads and installs nextcloud on its first start.
+# This takes a while, but the docker command returns before this is completed.
+# Trying to run the config task will therefore fail if run directly.
+# Instead, wait for the occ to become available in the volume - this means
+# that nextcloud is now installed
+- name: Wait for occ to become available
+  wait_for:
+    path: "{{ volume_basedir }}/nextcloud/config/www/nextcloud/occ"
+    timeout: 300
+    msg: "File not found after 300s. Check the nextcloud container, probably something went wrong there."
+  tags:
+    - config
 
-  # The nextcloud container downloads and installs nextcloud on its first start.
-  # This takes a while, but the docker command returns before this is completed.
-  # Trying to run the config task will therefore fail if run directly.
-  # Instead, wait for the occ to become available in the volume - this means
-  # that nextcloud is now installed
-  - name: Wait for occ to become available
-    wait_for:
-      path: "{{ volume_basedir }}/nextcloud/config/www/nextcloud/occ"
-      timeout: 300
-      msg: "File not found after 300s. Check the nextcloud container, probably something went wrong there."
-    tags:
-      - config
-
-  # Configure nextcloud using the occ tool
-  # For more information see 
-  # https://docs.nextcloud.com/server/12/admin_manual/configuration_server/occ_command.html#occ-command-directory
-  # 
-  # Note:
-  # Database type still needs to be 'mysql' because nextcloud does not
-  # differentiate between mysql and mariadb
-  #
-  # 
-  # TODO: This task will fail if nextcloud has already been configured,
-  # that is, if the database already contains the same admin user.
-  # While that is strictly speaking still idempotent, need to find
-  # a more elegant solution.
-  - name: Configure
-    command: "docker exec --interactive --user {{ uid }} \
-            nextcloud \
-            /bin/bash -c 
-                \"whoami;
-                php /config/www/nextcloud/occ maintenance:install \
-                        --no-interaction \
-                        --database 'mysql' \
-                        --database-name 'nextcloud' \
-                        --database-user 'root' \
-                        --database-host 'mysql' \
-                        --database-pass '{{ mysql_root_password }}' \
-                        --admin-user '{{ nextcloud_admin_user }}' \
-                        --admin-pass '{{ nextcloud_admin_password }}' \
-                        --data-dir=/data;
-                php /config/www/nextcloud/occ maintenance:mode --on;
-                php /config/www/nextcloud/occ config:system:set trusted_domains 1 --value 'chrissrv';
-                php /config/www/nextcloud/occ config:system:set trusted_domains 2 --value 'dinosaurs.privatedns.org';
-                php /config/www/nextcloud/occ maintenance:mode --off\""
-    tags:
-      - config
+# Configure nextcloud using the occ tool
+# For more information see 
+# https://docs.nextcloud.com/server/12/admin_manual/configuration_server/occ_command.html#occ-command-directory
+# 
+# Note:
+# Database type still needs to be 'mysql' because nextcloud does not
+# differentiate between mysql and mariadb
+#
+# 
+# TODO: This task will fail if nextcloud has already been configured,
+# that is, if the database already contains the same admin user.
+# While that is strictly speaking still idempotent, need to find
+# a more elegant solution.
+- name: Configure
+  command: "docker exec --interactive --user {{ uid }} \
+          nextcloud \
+          /bin/bash -c 
+              \"whoami;
+              php /config/www/nextcloud/occ maintenance:install \
+                      --no-interaction \
+                      --database 'mysql' \
+                      --database-name 'nextcloud' \
+                      --database-user 'root' \
+                      --database-host 'mysql' \
+                      --database-pass '{{ mysql_root_password }}' \
+                      --admin-user '{{ nextcloud_admin_user }}' \
+                      --admin-pass '{{ nextcloud_admin_password }}' \
+                      --data-dir=/data;
+              php /config/www/nextcloud/occ maintenance:mode --on;
+              php /config/www/nextcloud/occ config:system:set trusted_domains 1 --value 'chrissrv';
+              php /config/www/nextcloud/occ config:system:set trusted_domains 2 --value 'dinosaurs.privatedns.org';
+              php /config/www/nextcloud/occ maintenance:mode --off\""
+  tags:
+    - config

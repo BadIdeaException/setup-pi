@@ -1,0 +1,24 @@
+---
+- name: Prepare the system
+  hosts: all
+  become: yes
+  become_user: root
+
+  roles:
+    - system
+  
+- name: Install dockerized MariaDB
+  hosts: all
+  become: yes
+  become_user: root
+
+  roles:
+    - mariadb
+
+- name: Install and configure dockerized Nextcloud
+  hosts: all
+  become: yes
+  become_user: root
+
+  roles:
+    - nextcloud

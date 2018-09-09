@@ -4,48 +4,36 @@
 #   - https://hub.docker.com/r/linuxserver/mariadb
 #   - https://hub.docker.com/r/lsioarmhf/mariadb
 
-- name: Install dockerized mariadb
-  hosts: all
-  become: yes
-  become_user: root
-      
-  vars:
-    image_name: "{{ { 
-      'armv7l': 'lsioarmhf/mariadb', 
-      'x86_64': 'linuxserver/mariadb' 
-    }[ansible_architecture] }}"
+- name: Create volumes
+  file:
+    path: "{{ volume_basedir }}/mariadb/data"
+    state: directory
+    
+- name: Pull image
+  docker_image:
+    name: "{{ image_name }}"
 
-  tasks:
-  - name: Create volumes
-    file:
-      path: "{{ volume_basedir }}/mariadb/data"
-      state: directory
-      
-  - name: Pull image
-    docker_image:
-      name: "{{ image_name }}"
+- name: Check all required configuration data is available
+  assert:
+    that: "{{ item }} is defined"
+    msg: "The {{ item }} is not set. You can set it by running the playbook as\n\n    ansible-playbook -e mysql_root_password=<password> \n\nor by storing it in a configuration file and loading this using the -e switch and prefixing the filename with an @ like this:\n\n    ansible-playbook -e @<path-to-configuration-file>"
+    success_msg: "Variable {{ item }} exists"
+  with_items:
+    - mysql_root_password
+  tags:
+    - run
 
-  - name: Check all required configuration data is available
-    assert:
-      that: "{{ item }} is defined"
-      msg: "The {{ item }} is not set. You can set it by running the playbook as\n\n    ansible-playbook -e mysql_root_password=<password> \n\nor by storing it in a configuration file and loading this using the -e switch and prefixing the filename with an @ like this:\n\n    ansible-playbook -e @<path-to-configuration-file>"
-      success_msg: "Variable {{ item }} exists"
-    with_items:
-      - mysql_root_password
-    tags:
-      - run
-
-  - name: Run container
-    docker_container:
-      detach: yes
-      image: "{{ image_name }}"
-      name: mysql
-      env:
-        MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
-      volumes:
-        - "{{ volume_basedir }}/mariadb/data:/config"
-      networks:
-        - { name: intercontainer }
-      restart_policy: always
-    tags:
-      - run
+- name: Run container
+  docker_container:
+    detach: yes
+    image: "{{ image_name }}"
+    name: mysql
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
+    volumes:
+      - "{{ volume_basedir }}/mariadb/data:/config"
+    networks:
+      - { name: intercontainer }
+    restart_policy: always
+  tags:
+    - run

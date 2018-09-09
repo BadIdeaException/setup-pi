@@ -1,0 +1,4 @@
+image_name: "{{ { 
+  'armv7l': 'lsioarmhf/nextcloud', 
+  'x86_64': 'linuxserver/nextcloud' 
+}[ansible_architecture] }}"

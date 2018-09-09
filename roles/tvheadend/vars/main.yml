@@ -1,0 +1,4 @@
+image_name: "{{ { 
+  'armv7l': 'lsioarmhf/tvheadend', 
+  'x86_64': 'linuxserver/tvheadend' 
+}[ansible_architecture] }}"
