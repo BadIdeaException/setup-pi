@@ -1,0 +1,67 @@
+---
+# Install a dockerized TVHeadend server
+# 
+# For more information see
+#   - https://hub.docker.com/r/linuxserver/tvheadend
+#   - https://hub.docker.com/r/lsioarmhf/tvheadend
+
+- name: Install tvheadend
+  hosts: all
+  become: yes
+  become_user: root
+
+  vars: 
+    image_name: "{{ {
+      'armv7l': 'lsioarmhf/tvheadend',
+      'x86_64': 'linuxserver/tvheadend'
+    }[ansible_architecture] }}"
+
+  tasks:
+
+    - name: Pull image
+      docker_image:
+        name: "{{ image_name }}"
+
+    # Get the group id of the dvb device
+    # We will use it as the PGID of the tvheadend container to
+    # avoid permission issues when accessing it
+    # If the device does not exist, dvb_stat will contain 
+    # the field exists: false
+    - name: Get gid of dvb device
+      stat:
+        path: "/dev/dvb/adapter0/frontend0"
+      register: dvb_stat
+      tags:
+        - run
+        
+    - name: Create volumes
+      file:
+        path: "{{ volume_basedir }}/tvheadend/{{ item }}"
+        state: directory
+      with_items:
+        - config
+        - recordings
+
+    - name: Run container
+      docker_container:
+        detach: yes
+        image: "{{ image_name }}"
+        volumes:
+          - "{{ volume_basedir }}/tvheadend/config:/config"
+          - "{{ volume_basedir }}/tvheadend/recordings:/recordings"
+        # Network needs to be in "host"
+        # See https://github.com/linuxserver/docker-tvheadend#host-vs-bridge
+        network_mode: host
+        devices:
+          "{{ dvb_stat.stat.exists | ternary(['/dev/dvb'], []) }}"
+        env:
+          # If device file for dvb adapter was found, use its gid as the PGID parameter for the container
+          # In this case, we're passing a dict like: { 'PGID': 123 }
+          # If not, turn this into an empty dict
+          # dvb_stat.stat.gid needs to be defaulted, otherwise ansible will complain about an undefined
+          # variable if the device did not exist, even though its value will never be used.
+          "{{ dvb_stat.stat.exists | ternary({ 'PGID': (dvb_stat.stat.gid | default(0)) }, {}) }}"
+        name: "tvheadend"
+        restart_policy: always
+      tags:
+        - run
