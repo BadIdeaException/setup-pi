@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  nextcloud:
+    image: {{ lsio_prefix }}/nextcloud
+    networks: 
+      - intercontainer
+    volumes:
+      - "{{ volume_basedir }}/nextcloud/config:/config"
+      - "{{ volume_basedir }}/nextcloud/data:/data"
+    restart: always
+    depends_on: 
+      - mysql
+
+  mysql:
+    image: {{ lsio_prefix }}/mariadb
+    networks:
+      - intercontainer
+    volumes:
+      - "{{ volume_basedir }}/mariadb/data:/config"
+    environment:
+      - MYSQL_ROOT_PASSWORD={{ mysql_root_password }}
+    restart: always
+
+  gateway:
+    image: chrissrv/gateway
+    networks:
+      - intercontainer
+    volumes:
+      - "{{ volume_basedir }}/gateway/letsencrypt:/var/letsencrypt"
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always

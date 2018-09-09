@@ -1,0 +1,7 @@
+---
+
+# Create a new user and delete the standard pi user
+- import_playbook: users.yml
+
+# Install docker
+- import_playbook: docker.yml
