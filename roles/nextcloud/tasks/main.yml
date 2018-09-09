@@ -102,11 +102,10 @@
   command: "docker exec --interactive --user {{ uid }} \
           nextcloud \
           /bin/bash -c 
-              \"whoami;
-              php /config/www/nextcloud/occ maintenance:install \
+              \"php /config/www/nextcloud/occ maintenance:install \
                       --no-interaction \
                       --database 'mysql' \
-                      --database-name 'nextcloud' \
+                      --database-name 'owncloud' \
                       --database-user 'root' \
                       --database-host 'mysql' \
                       --database-pass '{{ mysql_root_password }}' \
