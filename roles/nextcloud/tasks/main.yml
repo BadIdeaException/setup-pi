@@ -11,7 +11,7 @@
 
   vars:
     image_name: "{{ { 
-      'armhf': 'lsioarmhf/nextcloud', 
+      'armv7l': 'lsioarmhf/nextcloud', 
       'x86_64': 'linuxserver/nextcloud' 
     }[ansible_architecture] }}"
 
@@ -105,6 +105,7 @@
   # Database type still needs to be 'mysql' because nextcloud does not
   # differentiate between mysql and mariadb
   #
+  # 
   # TODO: This task will fail if nextcloud has already been configured,
   # that is, if the database already contains the same admin user.
   # While that is strictly speaking still idempotent, need to find
