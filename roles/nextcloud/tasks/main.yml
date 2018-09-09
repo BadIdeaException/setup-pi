@@ -69,6 +69,7 @@
         - "{{ volume_basedir }}/nextcloud/data:/data"
       networks:
         - { name: intercontainer }
+      restart_policy: always
     tags:
       - run
 
