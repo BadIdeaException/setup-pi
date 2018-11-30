@@ -1,0 +1,66 @@
+---
+# Install a dockerized cups print server
+#
+# Since no images are available from trusted image distributors
+# (hypriot, linuxserver), we roll our own.
+# 
+
+- name: Build image
+  docker_image:
+    path: "{{ role_path }}/files/"
+    name: "chrissrv/cups"
+
+- name: Create volume
+  file:
+    path: "{{ volume_basedir }}/cups"
+    state: directory
+
+# TODO Is there a way to find out the printer's major number in Ansible?
+
+# Ansible's docker_container module does not currently 
+# support the use of Docker's --device-cgroup-rule command
+# line switch.
+# Therefore, we create the container directly using a
+# shell command.
+- name: Run container
+  command: "docker run --detach \
+     --restart=always \
+     --network intercontainer \      
+     --publish 631:631 \ 
+     --volume /var/vol/cups/:/etc/cups \
+     --device-cgroup-rule \"c {{ major }}:* rmw\" \
+     --name cups \
+     chrissrv/cups"
+
+# Install udev rule file so the cups server will be able to deal with
+# the printer being turned on and off
+- name: Install udev rules    
+  file:
+    src: '99-docker-cups.rules'
+    dest: /etc/udev/rules.d/
+  register: install_rules
+
+# Reload udev rules without restarting
+- name: Reload udev rules
+  shell: udevadm control --reload
+  when: install_rules.changed
+
+# Switch to this version once either the --device-cgroup-rule
+# option becomes available in the docker_container module,
+# or a way is introduced to pass further parameters to docker.
+# - name: Run container
+#   docker_container:
+#     detach: yes
+#     image: "{{ image_name }}"
+#     name: cups
+#     volumes:
+#       - "{{ volume_basedir }}/cups:/etc/cups"
+#     published_ports:
+#       - "631:631"
+#     networks:
+#       - { name: "intercontainer" }        
+#     restart_policy: always
+#   tags: 
+#     - run
+
+...

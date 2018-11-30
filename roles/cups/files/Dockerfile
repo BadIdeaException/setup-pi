@@ -7,7 +7,6 @@ MAINTAINER chris
 # Install cups
 RUN apk update \
 	&& apk install cups \
-
 # Create cups user and add to lpadmin and lp groups
 	&& useradd -H cups \
 	&& adduser cups lpadmin lp

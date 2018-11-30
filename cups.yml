@@ -1,0 +1,19 @@
+---
+
+- name: Prepare the system
+  hosts: all
+  become: yes
+  become_user: root
+
+  roles:
+  #  - system
+  
+- name: Install dockerized cups print server
+  hosts: all
+  become: yes
+  become_user: root
+
+  roles:
+    - cups
+
+...
